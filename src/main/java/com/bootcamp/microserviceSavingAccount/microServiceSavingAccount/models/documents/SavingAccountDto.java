@@ -9,8 +9,9 @@ public class SavingAccountDto {
     private String id;
     private String numAccount;
     private String currentBalance;
-    private Date createdAt;
     private String status;
+    private Date createdAt;
+    private Date updateAt;
     private List<PersonDto> personList;
 
     public SavingAccountDto() {
@@ -21,51 +22,61 @@ public class SavingAccountDto {
         this.personList.add(personDto);
     }
 
-    public String getId() {
-        return id;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public void setId(String id) {
-        this.id = id;
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public String getNumAccount() {
-        return numAccount;
-    }
+	public String getNumAccount() {
+		return numAccount;
+	}
 
-    public void setNumAccount(String numAccount) {
-        this.numAccount = numAccount;
-    }
+	public void setNumAccount(String numAccount) {
+		this.numAccount = numAccount;
+	}
 
-    public String getCurrentBalance() {
-        return currentBalance;
-    }
+	public String getCurrentBalance() {
+		return currentBalance;
+	}
 
-    public void setCurrentBalance(String currentBalance) {
-        this.currentBalance = currentBalance;
-    }
+	public void setCurrentBalance(String currentBalance) {
+		this.currentBalance = currentBalance;
+	}
 
-    public Date getCreatedAt() {
-        return createdAt;
-    }
+	public String getStatus() {
+		return status;
+	}
 
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
+	public void setStatus(String status) {
+		this.status = status;
+	}
 
-    public String getStatus() {
-        return status;
-    }
+	public Date getCreatedAt() {
+		return createdAt;
+	}
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
+	}
 
-    public List<PersonDto> getPersonList() {
-        return personList;
-    }
+	public Date getUpdateAt() {
+		return updateAt;
+	}
 
-    public void setPersonList(List<PersonDto> personList) {
-        this.personList = personList;
-    }
+	public void setUpdateAt(Date updateAt) {
+		this.updateAt = updateAt;
+	}
+
+	public List<PersonDto> getPersonList() {
+		return personList;
+	}
+
+	public void setPersonList(List<PersonDto> personList) {
+		this.personList = personList;
+	}
+
+    
 }

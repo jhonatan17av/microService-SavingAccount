@@ -12,8 +12,9 @@ public class ConvertSavingAccount {
         dto.setId(savingAccount.getId());
         dto.setNumAccount(savingAccount.getNumAccount());
         dto.setCurrentBalance(savingAccount.getCurrentBalance());
-        dto.setCreatedAt(savingAccount.getCreatedAt());
         dto.setStatus(savingAccount.getStatus());
+        dto.setCreatedAt(savingAccount.getCreatedAt());
+        dto.setUpdateAt(savingAccount.getUpdateAt());
         return dto;
     }
 
@@ -22,8 +23,9 @@ public class ConvertSavingAccount {
         savingAccount.setId(dto.getId());
         savingAccount.setNumAccount(dto.getNumAccount());
         savingAccount.setCurrentBalance(dto.getCurrentBalance());
-        savingAccount.setCreatedAt(dto.getCreatedAt());
         savingAccount.setStatus(dto.getStatus());
+        savingAccount.setCreatedAt(dto.getCreatedAt());
+        savingAccount.setUpdateAt(dto.getUpdateAt());
         return savingAccount;
     }
 

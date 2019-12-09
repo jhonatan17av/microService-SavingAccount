@@ -32,12 +32,12 @@ public class MicroServiceSavingAccountApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 
-		mongoTemplate.dropCollection("persons").subscribe();
+		mongoTemplate.dropCollection("savingAccounts").subscribe();
 
-		Flux.just(new SavingAccount("12345678910","10000",new Date(),"Active"),
-				new SavingAccount("10987654321","5000",new Date(),"Active"))
+		Flux.just(new SavingAccount("12345678910","10000","Active",new Date(),new Date()),
+				new SavingAccount("10987654321","5000","Active",new Date(),new Date()))
 				.flatMap(savingAccount -> dao.save(savingAccount))
-				.subscribe(savingAccount -> log.info("Person inserted :" + savingAccount.getNumAccount()));
+				.subscribe(savingAccount -> log.info("SavingAccount inserted :" + savingAccount.getNumAccount()));
 
 	}
 }
