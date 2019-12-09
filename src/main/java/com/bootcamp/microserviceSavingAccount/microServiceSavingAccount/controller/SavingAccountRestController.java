@@ -1,6 +1,7 @@
 package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.controller;
 
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.SavingAccount;
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.SavingAccountDto;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.services.SavingAccountServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,7 +25,7 @@ public class SavingAccountRestController {
     private SavingAccountServiceImpl savingAccountService;
 
     @GetMapping
-    public Mono<ResponseEntity<Flux<SavingAccount>>> findAllAccount() {
+    public Mono<ResponseEntity<Flux<SavingAccountDto>>> findAllAccount() {
         return Mono.just(ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(savingAccountService.findAll()))

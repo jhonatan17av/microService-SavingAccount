@@ -7,7 +7,7 @@ import reactor.core.publisher.Mono;
 public interface IPersonServiceDto {
 
     public Flux<PersonDto> findAllPerson();
-    public Mono<PersonDto> findByIdPerson(String idPerson);
+    public Flux<PersonDto> findByIdPerson(String idPerson);
     public Mono<PersonDto> savePerson(PersonDto personDto);
 
 }

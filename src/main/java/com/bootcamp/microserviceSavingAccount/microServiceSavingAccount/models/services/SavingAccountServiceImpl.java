@@ -1,7 +1,12 @@
 package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.services;
 
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dao.ConvertSavingAccount;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dao.ISavingAccountDao;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.SavingAccount;
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.SavingAccountDto;
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.services.serviceDto.IPersonServiceDto;
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.services.serviceDto.PersonServiceDto;
+import com.netflix.discovery.converters.Auto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -12,10 +17,19 @@ public class SavingAccountServiceImpl implements ISavingAccountService {
 
     @Autowired
     private ISavingAccountDao dao;
+    @Autowired
+    private ConvertSavingAccount convertSavingAccount;
+    @Autowired
+    private IPersonServiceDto personServiceDto;
 
     @Override
-    public Flux<SavingAccount> findAll() {
-        return dao.findAll();
+    public Flux<SavingAccountDto> findAll() {
+        return dao.findAll()
+                .flatMap(savingAccount ->{
+                   SavingAccountDto dto =  convertSavingAccount.toSavingAccountDto(savingAccount);
+                   dto.setPersonList(personServiceDto.findByIdPerson(savingAccount.getId()).collectList().block());
+                   return Mono.just(dto);
+                });
     }
 
     @Override

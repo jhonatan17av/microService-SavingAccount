@@ -25,12 +25,12 @@ public class PersonServiceDto implements IPersonServiceDto {
     }
 
     @Override
-    public Mono<PersonDto> findByIdPerson(String idPerson) {
+    public Flux<PersonDto> findByIdPerson(String idPerson) {
         return webClient.get()
                 .uri("/{id}", Collections.singletonMap("id", idPerson))
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
-                .bodyToMono(PersonDto.class);
+                .bodyToFlux(PersonDto.class);
     }
 
     @Override
