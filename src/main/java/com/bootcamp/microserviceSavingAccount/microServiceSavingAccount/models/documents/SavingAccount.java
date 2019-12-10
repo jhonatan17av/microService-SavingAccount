@@ -18,6 +18,8 @@ public class SavingAccount {
     @NotBlank
     private String numAccount;
     @NotBlank
+    private String nomAccount;
+    @NotBlank
     private String currentBalance;
     @NotBlank
     private String status;
@@ -25,6 +27,8 @@ public class SavingAccount {
     private Date createdAt;
     @NotBlank
     private Date updateAt;
+    @NotBlank
+    private PersonDto personDto;
 
     public SavingAccount() {
     }
