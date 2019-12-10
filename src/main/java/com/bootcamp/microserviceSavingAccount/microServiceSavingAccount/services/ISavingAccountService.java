@@ -1,4 +1,4 @@
-package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.services;
+package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.services;
 
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.SavingAccount;
 import reactor.core.publisher.Flux;

@@ -1,7 +1,8 @@
 package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.controller;
 
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.SavingAccount;
-import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.services.SavingAccountServiceImpl;
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.services.SavingAccountServiceImpl;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

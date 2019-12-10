@@ -1,7 +1,8 @@
 package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount;
 
-import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dao.ISavingAccountDao;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.SavingAccount;
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.repository.SavingAccountRepository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ import java.util.Date;
 public class MicroServiceSavingAccountApplication implements CommandLineRunner {
 
 	@Autowired
-	private ISavingAccountDao dao;
+	private SavingAccountRepository dao;
 	@Autowired
 	private ReactiveMongoTemplate mongoTemplate;
 	private static final Logger log = LoggerFactory.getLogger(MicroServiceSavingAccountApplication.class);

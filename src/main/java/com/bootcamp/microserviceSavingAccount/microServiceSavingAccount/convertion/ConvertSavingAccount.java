@@ -1,4 +1,4 @@
-package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dao;
+package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.convertion;
 
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.SavingAccount;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.SavingAccountDto;

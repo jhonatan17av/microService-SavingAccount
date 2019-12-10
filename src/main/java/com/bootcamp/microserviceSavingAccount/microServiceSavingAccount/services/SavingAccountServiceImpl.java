@@ -1,7 +1,8 @@
-package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.services;
+package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.services;
 
-import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dao.ISavingAccountDao;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.SavingAccount;
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.repository.SavingAccountRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -11,7 +12,7 @@ import reactor.core.publisher.Mono;
 public class SavingAccountServiceImpl implements ISavingAccountService {
 
     @Autowired
-    private ISavingAccountDao dao;
+    private SavingAccountRepository dao;
 
     @Override
     public Flux<SavingAccount> findAll() {
