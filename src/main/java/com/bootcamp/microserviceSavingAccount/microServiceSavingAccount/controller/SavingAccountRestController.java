@@ -1,6 +1,7 @@
 package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.controller;
 
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.SavingAccount;
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.SavingAccountDto;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.services.SavingAccountServiceImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +52,7 @@ public class SavingAccountRestController {
     }
 
     @PostMapping
-    public Mono<ResponseEntity<Map<String, Object>>> saveAccount(@RequestBody Mono<SavingAccount> savingAccountMono) {
+    public Mono<ResponseEntity<Map<String, Object>>> saveAccount(@RequestBody Mono<SavingAccountDto> savingAccountMono) {
 
         Map<String, Object> respuesta = new HashMap<>();
 
@@ -82,8 +83,8 @@ public class SavingAccountRestController {
         });
     }
 
-    @PutMapping("/{id}")
-    public Mono<ResponseEntity<SavingAccount>> updateSavingAccount(@RequestBody SavingAccount savingAccount, @PathVariable String id) {
+    /*@PutMapping("/{id}")
+    public Mono<ResponseEntity<SavingAccountDto>> updateSavingAccount(@RequestBody SavingAccountDto savingAccount, @PathVariable String id) {
         return savingAccountService.findById(id)
                 .flatMap(s -> {
                     s.setNumAccount(savingAccount.getNumAccount());
@@ -96,7 +97,7 @@ public class SavingAccountRestController {
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(account))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
-    }
+    }*/
 
 
     @DeleteMapping("/{id}")

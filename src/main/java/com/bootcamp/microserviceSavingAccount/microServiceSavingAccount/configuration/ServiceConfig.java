@@ -8,12 +8,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class ServiceConfig {
 	
-	@Value("${config.base.service.uri}")
+	@Value("${config.base.endpoint}")
 	  private String pathPerson;
 
 	  @Bean
 	  public WebClient registrarWebClient() {
 	    return WebClient.create(pathPerson);
 	  }
-
 }

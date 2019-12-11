@@ -7,6 +7,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Document(collection = "savingAccounts")
@@ -20,27 +21,29 @@ public class SavingAccount {
     @NotBlank
     private String nomAccount;
     @NotBlank
-    private String currentBalance;
+    private String typeAccount;
+    @NotBlank
+    private Double currentBalance;
     @NotBlank
     private String status;
     @NotBlank
     private Date createdAt;
     @NotBlank
-    private Date updateAt;
-    @NotBlank
-    private PersonDto personDto;
+    private Date updatedAt;
 
     public SavingAccount() {
     }
 
-	public SavingAccount(@NotBlank String numAccount, @NotBlank String currentBalance, @NotBlank String status,
-			@NotBlank Date createdAt, @NotBlank Date updateAt) {
-		super();
+	public SavingAccount(@NotBlank String numAccount, @NotBlank String nomAccount, @NotBlank String typeAccount,
+			@NotBlank Double currentBalance, @NotBlank String status, @NotBlank Date createdAt,
+			@NotBlank Date updatedAt) {
 		this.numAccount = numAccount;
+		this.nomAccount = nomAccount;
+		this.typeAccount = typeAccount;
 		this.currentBalance = currentBalance;
 		this.status = status;
 		this.createdAt = createdAt;
-		this.updateAt = updateAt;
+		this.updatedAt = updatedAt;
 	}
 
 	public String getId() {
@@ -59,11 +62,27 @@ public class SavingAccount {
 		this.numAccount = numAccount;
 	}
 
-	public String getCurrentBalance() {
+	public String getNomAccount() {
+		return nomAccount;
+	}
+
+	public void setNomAccount(String nomAccount) {
+		this.nomAccount = nomAccount;
+	}
+
+	public String getTypeAccount() {
+		return typeAccount;
+	}
+
+	public void setTypeAccount(String typeAccount) {
+		this.typeAccount = typeAccount;
+	}
+
+	public Double getCurrentBalance() {
 		return currentBalance;
 	}
 
-	public void setCurrentBalance(String currentBalance) {
+	public void setCurrentBalance(Double currentBalance) {
 		this.currentBalance = currentBalance;
 	}
 
@@ -83,14 +102,14 @@ public class SavingAccount {
 		this.createdAt = createdAt;
 	}
 
-	public Date getUpdateAt() {
-		return updateAt;
+	public Date getUpdatedAt() {
+		return updatedAt;
 	}
 
-	public void setUpdateAt(Date updateAt) {
-		this.updateAt = updateAt;
-	}
-
+	public void setUpdatedAt(Date updatedAt) {
+		this.updatedAt = updatedAt;
+	} 
+	
     
     
 }

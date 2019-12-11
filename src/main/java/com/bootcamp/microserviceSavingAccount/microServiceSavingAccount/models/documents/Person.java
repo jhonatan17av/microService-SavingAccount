@@ -1,10 +1,12 @@
 package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PersonDto {
+public class Person {
 
     private String id;
     private String namePerson;
@@ -13,9 +15,17 @@ public class PersonDto {
     private String numDoc;
     private String gender;
     private Date dateBirth;
+    private Date createdAt;
+    private Date updatedAt;
     private Map<String, String> listNumAccounts;
     
+    public Person() {
+    	listNumAccounts = new HashMap<>();
+    }
     
+    public void putListNumAccount(String k, String v) {
+    	this.listNumAccounts.put(k, v);
+    }
     
 	public String getId() {
 		return id;
@@ -59,12 +69,27 @@ public class PersonDto {
 	public void setDateBirth(Date dateBirth) {
 		this.dateBirth = dateBirth;
 	}
+	public Date getCreatedAt() {
+		return createdAt;
+	}
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
+	}
+	public Date getUpdatedAt() {
+		return updatedAt;
+	}
+	public void setUpdatedAt(Date updatedAt) {
+		this.updatedAt = updatedAt;
+	}
 	public Map<String, String> getListNumAccounts() {
 		return listNumAccounts;
 	}
 	public void setListNumAccounts(Map<String, String> listNumAccounts) {
 		this.listNumAccounts = listNumAccounts;
 	}
+    
+    
+
 
     
 }
