@@ -2,7 +2,7 @@ package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.service
 
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.convertion.ConvertSavingAccount;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.SavingAccount;
-import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.SavingAccountDto;
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dto.SavingAccountDto;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.repository.SavingAccountRepository;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.services.serviceDto.IPersonServiceDto;
 
@@ -38,20 +38,36 @@ public class SavingAccountServiceImpl implements ISavingAccountService {
     }
 
     @Override
-    public Mono<SavingAccountDto> save(SavingAccountDto savingAccountDto) {
+    public Mono<SavingAccountDto> saveSavingAccount(SavingAccountDto savingAccountDto) {
+
         return repository.save(conv.toSavingAccount(savingAccountDto))
-        		.flatMap(savingAccount -> Mono.just(conv.toSavingAccountDto(savingAccount)))
-        		.flatMap(dto -> {
-        			savingAccountDto.getListPersons().forEach(personDto -> {
-        				personDto.putListNumAccount(dto.getNomAccount(), dto.getNumAccount());
-        				dto.addListPerson(personService.savePerson(personDto).block());
-        			});
-        			return Mono.just(savingAccountDto);
-        		});
+                .flatMap(savingAccount -> {
+                    savingAccountDto.getListPersons().forEach(person -> {
+                        person.setIdAccount(savingAccount.getId());
+                        person.setNumAccount(savingAccount.getNumAccount());
+                        person.setNomAccount(savingAccount.getNomAccount());
+                        person.setTypeAccount(savingAccount.getTypeAccount());
+                        personService.savePerson(person).block();
+                    });
+                    return Mono.just(savingAccountDto);
+                });
+    }
+
+    @Override
+    public Mono<SavingAccount> updateAccount(SavingAccount savingAccount) {
+        return repository.save(savingAccount);
     }
 
     @Override
     public Mono<Void> delete(SavingAccount savingAccount) {
         return repository.delete(savingAccount);
+    }
+
+    @Override
+    public Mono<SavingAccount> movimiento(String numAccount, String tipoMov, Double monto) {
+        /*if (tipoMov.equals("Deposito")){
+
+        }*/
+        return null;
     }
 }

@@ -1,95 +1,45 @@
 package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Data
 public class Person {
 
-    private String id;
+    @NotBlank
     private String namePerson;
+    @NotBlank
     private String lastName;
+    @NotBlank
     private String typeDoc;
+    @NotBlank
     private String numDoc;
+    @NotBlank
     private String gender;
+    @NotBlank
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private Date dateBirth;
+    @NotBlank
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private Date createdAt;
+    @NotBlank
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private Date updatedAt;
-    private Map<String, String> listNumAccounts;
-    
-    public Person() {
-    	listNumAccounts = new HashMap<>();
-    }
-    
-    public void putListNumAccount(String k, String v) {
-    	this.listNumAccounts.put(k, v);
-    }
-    
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
-	public String getNamePerson() {
-		return namePerson;
-	}
-	public void setNamePerson(String namePerson) {
-		this.namePerson = namePerson;
-	}
-	public String getLastName() {
-		return lastName;
-	}
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-	public String getTypeDoc() {
-		return typeDoc;
-	}
-	public void setTypeDoc(String typeDoc) {
-		this.typeDoc = typeDoc;
-	}
-	public String getNumDoc() {
-		return numDoc;
-	}
-	public void setNumDoc(String numDoc) {
-		this.numDoc = numDoc;
-	}
-	public String getGender() {
-		return gender;
-	}
-	public void setGender(String gender) {
-		this.gender = gender;
-	}
-	public Date getDateBirth() {
-		return dateBirth;
-	}
-	public void setDateBirth(Date dateBirth) {
-		this.dateBirth = dateBirth;
-	}
-	public Date getCreatedAt() {
-		return createdAt;
-	}
-	public void setCreatedAt(Date createdAt) {
-		this.createdAt = createdAt;
-	}
-	public Date getUpdatedAt() {
-		return updatedAt;
-	}
-	public void setUpdatedAt(Date updatedAt) {
-		this.updatedAt = updatedAt;
-	}
-	public Map<String, String> getListNumAccounts() {
-		return listNumAccounts;
-	}
-	public void setListNumAccounts(Map<String, String> listNumAccounts) {
-		this.listNumAccounts = listNumAccounts;
-	}
-    
-    
+    @NotBlank
+    private String idAccount;
+    @NotBlank
+    private String numAccount;
+    @NotBlank
+    private String nomAccount;
+    @NotBlank
+    private String typeAccount;
 
-
-    
 }

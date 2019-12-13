@@ -1,7 +1,8 @@
 package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.controller;
 
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.convertion.ConvertSavingAccount;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.SavingAccount;
-import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.SavingAccountDto;
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dto.SavingAccountDto;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.services.SavingAccountServiceImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.WebExchangeBindException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import sun.invoke.empty.Empty;
 
 import java.net.URI;
 import java.util.Date;
@@ -24,6 +26,8 @@ public class SavingAccountRestController {
 
     @Autowired
     private SavingAccountServiceImpl savingAccountService;
+    @Autowired
+    private ConvertSavingAccount convertSavingAccount;
 
     @GetMapping
     public Mono<ResponseEntity<Flux<SavingAccount>>> findAllAccount() {
@@ -57,14 +61,11 @@ public class SavingAccountRestController {
         Map<String, Object> respuesta = new HashMap<>();
 
         return savingAccountMono.flatMap(savingAccount -> {
-            if (savingAccount.getCreatedAt() == null) {
-                savingAccount.setCreatedAt(new Date());
-            }
-            return savingAccountService.save(savingAccount)
+            return savingAccountService.saveSavingAccount(savingAccount)
                     .map(p -> {
                         respuesta.put("SavingAccount :", savingAccount);
                         return ResponseEntity
-                                .created(URI.create("/savinAccount"))
+                                .created(URI.create("/savingAccount"))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .body(respuesta);
                     });
@@ -83,22 +84,24 @@ public class SavingAccountRestController {
         });
     }
 
-    /*@PutMapping("/{id}")
-    public Mono<ResponseEntity<SavingAccountDto>> updateSavingAccount(@RequestBody SavingAccountDto savingAccount, @PathVariable String id) {
+    @PutMapping("/{id}")
+    public Mono<ResponseEntity<SavingAccount>> updateSavingAccount(@RequestBody SavingAccount savingAccount, @PathVariable String id) {
         return savingAccountService.findById(id)
-                .flatMap(s -> {
+                .flatMap(s ->  {
                     s.setNumAccount(savingAccount.getNumAccount());
+                    s.setNomAccount(savingAccount.getNomAccount());
+                    s.setTypeAccount(savingAccount.getTypeAccount());
                     s.setCurrentBalance(savingAccount.getCurrentBalance());
-                    s.setCreatedAt(savingAccount.getCreatedAt());
                     s.setStatus(savingAccount.getStatus());
-                    return savingAccountService.save(s);
+                    s.setCreatedAt(savingAccount.getCreatedAt());
+                    s.setUpdatedAt(savingAccount.getUpdatedAt());
+                    return savingAccountService.updateAccount(s);
                 }).map(account -> ResponseEntity
                         .created(URI.create("/savingAccount".concat(account.getId())))
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(account))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
-    }*/
-
+    }
 
     @DeleteMapping("/{id}")
     public Mono<ResponseEntity<Void>> deleteSavingAccount(@PathVariable String id) {

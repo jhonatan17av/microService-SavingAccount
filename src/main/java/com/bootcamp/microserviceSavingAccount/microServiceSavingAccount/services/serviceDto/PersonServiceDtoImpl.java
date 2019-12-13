@@ -23,5 +23,4 @@ public class PersonServiceDtoImpl implements IPersonServiceDto{
 				.retrieve()
 				.bodyToMono(Person.class);
 	}
-
 }
