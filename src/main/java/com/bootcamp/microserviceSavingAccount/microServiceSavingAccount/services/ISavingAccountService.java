@@ -14,6 +14,6 @@ public interface ISavingAccountService {
     Mono<SavingAccountDto> saveSavingAccount(SavingAccountDto savingAccountDto);
     Mono<SavingAccount> updateAccount(SavingAccount savingAccount);
     Mono<Void> delete(SavingAccount savingAccount);
-    Mono<SavingAccount> movimiento(String numAccount, String tipoMov, Double monto);
+    Mono<SavingAccount> movimiento(String numAccount);
 
 }

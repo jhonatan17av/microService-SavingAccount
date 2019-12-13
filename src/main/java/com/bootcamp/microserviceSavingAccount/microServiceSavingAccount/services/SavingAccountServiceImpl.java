@@ -7,6 +7,8 @@ import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.reposito
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.services.serviceDto.IPersonServiceDto;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -21,6 +23,10 @@ public class SavingAccountServiceImpl implements ISavingAccountService {
     private IPersonServiceDto personService;
     @Autowired
     private ConvertSavingAccount conv;
+
+    private static final Logger LOG =
+            LoggerFactory.getLogger(SavingAccountServiceImpl.class);
+
 
     @Override
     public Flux<SavingAccount> findAll() {
@@ -64,10 +70,24 @@ public class SavingAccountServiceImpl implements ISavingAccountService {
     }
 
     @Override
-    public Mono<SavingAccount> movimiento(String numAccount, String tipoMov, Double monto) {
-        /*if (tipoMov.equals("Deposito")){
+    public Mono<SavingAccount> movimiento(String numAccount){
+        double nuevoMonto = 150.0;
 
-        }*/
-        return null;
+        return repository.findBynumAccount(numAccount)
+                .flatMap(savingAccount -> {
+                    savingAccount.setCurrentBalance(savingAccount.getCurrentBalance() + nuevoMonto);
+                    return Mono.just(repository.save(savingAccount)).block();
+                });
+
+       /* return repository.findBynumAccount(numAccount)
+                .map(savingAccount -> {
+                    savingAccount.setCurrentBalance(savingAccount.getCurrentBalance() + nuevoMonto);
+                    return repository.save(savingAccount);
+                })
+                .block();
+
+        */
+
+
     }
 }

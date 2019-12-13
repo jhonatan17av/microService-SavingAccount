@@ -29,6 +29,15 @@ public class SavingAccountRestController {
     @Autowired
     private ConvertSavingAccount convertSavingAccount;
 
+    @GetMapping("/mov/{numAccount}")
+    public Mono<ResponseEntity<SavingAccount>> movimiento(@PathVariable String numAccount) {
+        return savingAccountService.movimiento(numAccount)
+                .map(savingAccount -> ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(savingAccount))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
     @GetMapping
     public Mono<ResponseEntity<Flux<SavingAccount>>> findAllAccount() {
         return Mono.just(ResponseEntity.ok()
