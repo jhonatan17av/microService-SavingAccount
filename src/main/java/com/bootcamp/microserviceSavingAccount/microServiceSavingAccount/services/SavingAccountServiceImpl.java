@@ -1,8 +1,11 @@
 package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.services;
 
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.convertion.ConvertSavingAccount;
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.Movement;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.SavingAccount;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dto.SavingAccountDto;
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dto.SavingAccountDto_toMovement;
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.repository.MovementRespository;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.repository.SavingAccountRepository;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.services.serviceDto.IPersonServiceDto;
 
@@ -14,11 +17,15 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Date;
+
 @Service
 public class SavingAccountServiceImpl implements ISavingAccountService {
 
     @Autowired
-    private SavingAccountRepository repository;
+    private SavingAccountRepository repositorySavingAccount;
+    @Autowired
+    private MovementRespository respositoryMovement;
     @Autowired
     private IPersonServiceDto personService;
     @Autowired
@@ -30,23 +37,23 @@ public class SavingAccountServiceImpl implements ISavingAccountService {
 
     @Override
     public Flux<SavingAccount> findAll() {
-        return repository.findAll();
+        return repositorySavingAccount.findAll();
     }
 
     @Override
     public Mono<SavingAccount> findById(String id) {
-        return repository.findById(id);
+        return repositorySavingAccount.findById(id);
     }
 
     @Override
     public Mono<SavingAccount> findByNumAccount(String numAccount) {
-        return repository.findBynumAccount(numAccount);
+        return repositorySavingAccount.findBynumAccount(numAccount);
     }
 
     @Override
     public Mono<SavingAccountDto> saveSavingAccount(SavingAccountDto savingAccountDto) {
 
-        return repository.save(conv.toSavingAccount(savingAccountDto))
+        return repositorySavingAccount.save(conv.toSavingAccount(savingAccountDto))
                 .flatMap(savingAccount -> {
                     savingAccountDto.getListPersons().forEach(person -> {
                         person.setIdAccount(savingAccount.getId());
@@ -61,33 +68,54 @@ public class SavingAccountServiceImpl implements ISavingAccountService {
 
     @Override
     public Mono<SavingAccount> updateAccount(SavingAccount savingAccount) {
-        return repository.save(savingAccount);
+        return repositorySavingAccount.save(savingAccount);
     }
 
     @Override
     public Mono<Void> delete(SavingAccount savingAccount) {
-        return repository.delete(savingAccount);
+        return repositorySavingAccount.delete(savingAccount);
     }
 
     @Override
-    public Mono<SavingAccount> movimiento(String numAccount){
+    public Mono<SavingAccount> movimiento(String numAccount) {
         double nuevoMonto = 150.0;
 
-        return repository.findBynumAccount(numAccount)
+        return repositorySavingAccount.findBynumAccount(numAccount)
                 .flatMap(savingAccount -> {
                     savingAccount.setCurrentBalance(savingAccount.getCurrentBalance() + nuevoMonto);
-                    return Mono.just(repository.save(savingAccount)).block();
+                    return Mono.just(repositorySavingAccount.save(savingAccount)).block();
                 });
+    }
 
-       /* return repository.findBynumAccount(numAccount)
-                .map(savingAccount -> {
-                    savingAccount.setCurrentBalance(savingAccount.getCurrentBalance() + nuevoMonto);
-                    return repository.save(savingAccount);
-                })
-                .block();
+    @Override
+    public Mono<SavingAccount> movimientoConObjeto(Movement movement) {
 
-        */
+        return repositorySavingAccount.findBynumAccount(movement.getNumAccount())
+                .flatMap(savingAccount -> {
 
+                    movement.setCreatedAt(new Date());
+                    return respositoryMovement.save(movement)
+                            .flatMap(s -> {
+                                if (movement.getTypeMovement().equals("deposito")) {
+                                    savingAccount.setUpdatedAt(new Date());
+                                    savingAccount.setCurrentBalance(savingAccount.getCurrentBalance() + movement.getBalanceTransaction());
+                                    return repositorySavingAccount.save(savingAccount);
+                                } else {
+                                    savingAccount.setCurrentBalance(savingAccount.getCurrentBalance() - movement.getBalanceTransaction());
+                                    return repositorySavingAccount.save(savingAccount);
+                                }
+                            });
 
+                });
+    }
+
+    @Override
+    public Mono<Movement> saveMovement(Movement movement) {
+        return null;
+    }
+
+    @Override
+    public Flux<Movement> findAllMovement() {
+        return respositoryMovement.findAll();
     }
 }

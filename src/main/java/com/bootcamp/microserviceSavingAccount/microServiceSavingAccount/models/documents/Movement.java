@@ -16,14 +16,22 @@ public class Movement {
     @Id
     private String id;
     @NotBlank
-    private String numCuenta;
+    private String numAccount;
     @NotBlank
-    private String tipoMovimiento;
+    private String typeMovement;
     @NotBlank
-    private Double montoMovimiento;
-    @NotBlank
-    private Double saldoActual;
+    private Double balanceTransaction;
     @NotBlank
     @JsonFormat(pattern = "dd-MM-yyyy")
     private Date createdAt;
+
+    public Movement() {
+    }
+
+    public Movement(@NotBlank String numAccount, @NotBlank String typeMovement, @NotBlank Double balanceTransaction, @NotBlank Date createdAt) {
+        this.numAccount = numAccount;
+        this.typeMovement = typeMovement;
+        this.balanceTransaction = balanceTransaction;
+        this.createdAt = createdAt;
+    }
 }

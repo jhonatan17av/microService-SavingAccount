@@ -1,8 +1,10 @@
 package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.controller;
 
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.convertion.ConvertSavingAccount;
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.Movement;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.SavingAccount;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dto.SavingAccountDto;
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.services.ISavingAccountService;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.services.SavingAccountServiceImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +27,7 @@ import java.util.Map;
 public class SavingAccountRestController {
 
     @Autowired
-    private SavingAccountServiceImpl savingAccountService;
+    private ISavingAccountService savingAccountService;
     @Autowired
     private ConvertSavingAccount convertSavingAccount;
 
@@ -35,6 +37,24 @@ public class SavingAccountRestController {
                 .map(savingAccount -> ResponseEntity.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(savingAccount))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/mov2")
+    public Mono<ResponseEntity<SavingAccount>> movimiento2(@RequestBody Movement movement) {
+        return savingAccountService.movimientoConObjeto(movement)
+                .map(savingAccount -> ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(savingAccount))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/saveMov")
+    public Mono<ResponseEntity<Movement>> saveMovement(@RequestBody Movement movement) {
+        return savingAccountService.saveMovement(movement)
+                .map(m -> ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(m))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
@@ -93,10 +113,12 @@ public class SavingAccountRestController {
         });
     }
 
+
+
     @PutMapping("/{id}")
     public Mono<ResponseEntity<SavingAccount>> updateSavingAccount(@RequestBody SavingAccount savingAccount, @PathVariable String id) {
         return savingAccountService.findById(id)
-                .flatMap(s ->  {
+                .flatMap(s -> {
                     s.setNumAccount(savingAccount.getNumAccount());
                     s.setNomAccount(savingAccount.getNomAccount());
                     s.setTypeAccount(savingAccount.getTypeAccount());
@@ -119,6 +141,14 @@ public class SavingAccountRestController {
                     return savingAccountService.delete(savingAccount)
                             .then(Mono.just(new ResponseEntity<Void>(HttpStatus.NO_CONTENT)));
                 }).defaultIfEmpty(new ResponseEntity<Void>(HttpStatus.NOT_FOUND));
+    }
+
+    @GetMapping("/movements")
+    public Mono<ResponseEntity<Flux<Movement>>> findAllMovement(){
+        return Mono.just(ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(savingAccountService.findAllMovement()))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
 }
