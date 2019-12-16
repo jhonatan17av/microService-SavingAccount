@@ -1,6 +1,8 @@
 package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount;
 
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.Movement;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.SavingAccount;
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.repository.MovementRespository;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.repository.SavingAccountRepository;
 
 import org.slf4j.Logger;
@@ -20,7 +22,9 @@ import java.util.Date;
 public class MicroServiceSavingAccountApplication implements CommandLineRunner {
 
 	@Autowired
-	private SavingAccountRepository dao;
+	private SavingAccountRepository savingAccountRepository;
+	@Autowired
+	private MovementRespository movementRespository;
 	@Autowired
 	private ReactiveMongoTemplate mongoTemplate;
 	private static final Logger log = LoggerFactory.getLogger(MicroServiceSavingAccountApplication.class);
@@ -34,10 +38,14 @@ public class MicroServiceSavingAccountApplication implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 
 		mongoTemplate.dropCollection("savingAccounts").subscribe();
+		mongoTemplate.dropCollection("movements").subscribe();
 
 		Flux.just(new SavingAccount("9876543210","Cuenta de Ahorro","Vip" ,10000.00,"Active",new Date(),new Date()))
-				.flatMap(savingAccount -> dao.save(savingAccount))
+				.flatMap(savingAccount -> savingAccountRepository.save(savingAccount))
 				.subscribe(savingAccount -> log.info("SavingAccount inserted :" + savingAccount.getNumAccount()));
 
+		Flux.just(new Movement("9876543210","deposito",200.0,new Date()))
+				.flatMap(movement -> movementRespository.save(movement))
+				.subscribe(movement -> log.info("Movement inserted :" + movement.getNumAccount()));
 	}
 }
