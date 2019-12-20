@@ -6,6 +6,7 @@ import reactor.core.publisher.Mono;
 
 public interface IPersonServiceDto {
 
-	public Mono<Person> savePerson(Person person);
+	Mono<Person> savePerson(Person person);
+	Mono<Person> findBynumDoc(String numDoc);
 	
 }

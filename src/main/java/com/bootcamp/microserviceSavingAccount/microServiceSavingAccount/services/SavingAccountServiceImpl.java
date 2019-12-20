@@ -54,21 +54,44 @@ public class SavingAccountServiceImpl implements ISavingAccountService {
         return repoSavingAccount.findBynumAccount(numAccount);
     }
 
-    @Override
+
+   @Override
     public Mono<SavingAccountDto> saveSavingAccount(SavingAccountDto savingAccountDto) {
+
+        personService.findBynumDoc(savingAccountDto.getListPersons().forEach(person -> {
+
+        });)
 
         return repoSavingAccount.save(conv.toSavingAccount(savingAccountDto))
                 .flatMap(savingAccount -> {
+
                     savingAccountDto.getListPersons().forEach(person -> {
-                        person.setIdAccount(savingAccount.getId());
                         person.setNumAccount(savingAccount.getNumAccount());
                         person.setNomAccount(savingAccount.getNomAccount());
                         person.setTypeAccount(savingAccount.getTypeAccount());
+                        person.setStatus(savingAccount.getStatus());
                         personService.savePerson(person).block();
                     });
                     return Mono.just(savingAccountDto);
                 });
     }
+
+
+   /*@Override
+    public Mono<SavingAccountDto> saveSavingAccount(SavingAccountDto savingAccountDto) {
+
+        return repoSavingAccount.save(conv.toSavingAccount(savingAccountDto))
+                .flatMap(savingAccount -> {
+                    savingAccountDto.getListPersons().forEach(person -> {
+                        person.setNumAccount(savingAccount.getNumAccount());
+                        person.setNomAccount(savingAccount.getNomAccount());
+                        person.setTypeAccount(savingAccount.getTypeAccount());
+                        person.setStatus(savingAccount.getStatus());
+                        personService.savePerson(person).block();
+                    });
+                    return Mono.just(savingAccountDto);
+                });
+    }*/
 
     @Override
     public Mono<SavingAccount> updateAccount(SavingAccount savingAccount) {
@@ -111,4 +134,5 @@ public class SavingAccountServiceImpl implements ISavingAccountService {
     public Flux<Movement> findMovByNumAccount(String numAccount) {
         return repoMovement.findBynumAccount(numAccount);
     }
+
 }
