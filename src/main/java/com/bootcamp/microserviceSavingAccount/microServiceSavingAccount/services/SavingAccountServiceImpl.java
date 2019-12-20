@@ -2,6 +2,7 @@ package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.service
 
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.convertion.ConvertSavingAccount;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.Movement;
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.Person;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.SavingAccount;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dto.SavingAccountDto;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.repository.MovementRespository;
@@ -17,7 +18,10 @@ import org.springframework.validation.Validator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 
 @Service
@@ -55,25 +59,23 @@ public class SavingAccountServiceImpl implements ISavingAccountService {
     }
 
 
-   @Override
+    @Override
     public Mono<SavingAccountDto> saveSavingAccount(SavingAccountDto savingAccountDto) {
 
-        personService.findBynumDoc(savingAccountDto.getListPersons().forEach(person -> {
+        savingAccountDto.getListPersons().forEach(person -> {
 
-        });)
-
-        return repoSavingAccount.save(conv.toSavingAccount(savingAccountDto))
-                .flatMap(savingAccount -> {
-
-                    savingAccountDto.getListPersons().forEach(person -> {
-                        person.setNumAccount(savingAccount.getNumAccount());
-                        person.setNomAccount(savingAccount.getNomAccount());
-                        person.setTypeAccount(savingAccount.getTypeAccount());
-                        person.setStatus(savingAccount.getStatus());
-                        personService.savePerson(person).block();
+             personService.findBynumDoc(person.getNumDoc())
+                    .switchIfEmpty(Mono.empty())
+                    .flatMap(person1 -> {
+                        person1.setNumDoc(person.getNumDoc());
+                        person1.setNumAccount(savingAccountDto.getNumAccount());
+                        person1.setNomAccount(savingAccountDto.getNomAccount());
+                        person1.setStatus(savingAccountDto.getStatus());
+                      return Mono.just(Objects.requireNonNull(personService.savePerson(person1).block()));
                     });
-                    return Mono.just(savingAccountDto);
-                });
+                    return Mono.just(SavingAccount);
+
+        });
     }
 
 

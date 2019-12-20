@@ -1,10 +1,14 @@
 package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.convertion;
 
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.Movement;
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.Person;
 import org.springframework.stereotype.Controller;
 
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.SavingAccount;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dto.SavingAccountDto;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 public class ConvertSavingAccount {
@@ -32,6 +36,20 @@ public class ConvertSavingAccount {
 		savingAccount.setUpdatedAt(dto.getUpdatedAt());
 		return savingAccount;
 	}
+
+	public Person toPerson(SavingAccountDto dto){
+
+		/*List<Person> lst = new ArrayList<>();
+		dto.getListPersons().forEach();
+
+		Person person = new Person();
+		person.setNamePerson();
+
+		 */
+
+		return null;
+	}
+
 
 	public Movement toMovement(SavingAccountDto dto) {
 		Movement movement = new Movement();
