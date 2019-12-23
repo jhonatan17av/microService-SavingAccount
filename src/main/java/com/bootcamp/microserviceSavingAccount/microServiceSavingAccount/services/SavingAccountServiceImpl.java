@@ -4,6 +4,7 @@ import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.converti
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.Movement;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.Person;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.SavingAccount;
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dto.PersonDto;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dto.SavingAccountDto;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.repository.MovementRespository;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.repository.SavingAccountRepository;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.Validator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import sun.dc.path.PathError;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -62,20 +64,28 @@ public class SavingAccountServiceImpl implements ISavingAccountService {
     @Override
     public Mono<SavingAccountDto> saveSavingAccount(SavingAccountDto savingAccountDto) {
 
-        savingAccountDto.getListPersons().forEach(person -> {
+        List<String> documents = new ArrayList<>();
 
-             personService.findBynumDoc(person.getNumDoc())
-                    .switchIfEmpty(Mono.empty())
-                    .flatMap(person1 -> {
-                        person1.setNumDoc(person.getNumDoc());
-                        person1.setNumAccount(savingAccountDto.getNumAccount());
-                        person1.setNomAccount(savingAccountDto.getNomAccount());
-                        person1.setStatus(savingAccountDto.getStatus());
-                      return Mono.just(Objects.requireNonNull(personService.savePerson(person1).block()));
-                    });
-                    return Mono.just(SavingAccount);
+        savingAccountDto.getListPersons().forEach(person -> documents.add(person.getNumDoc()));
 
+        documents.forEach(numDoc -> {
+            if (personService.findBynumDoc(numDoc) != null) {
+                return null;
+            } else {
+                return repoSavingAccount.save(conv.toSavingAccount(savingAccountDto))
+                        .flatMap(savingAccount -> {
+                            savingAccountDto.getListPersons().forEach(person -> {
+                                person.setNumAccount(savingAccount.getNumAccount());
+                                person.setNomAccount(savingAccount.getNomAccount());
+                                person.setTypeAccount(savingAccount.getTypeAccount());
+                                person.setStatus(savingAccount.getStatus());
+                                personService.savePerson(person).block();
+                            });
+                            return Mono.just(savingAccountDto);
+                        });
+            }
         });
+        return Mono.just(savingAccountDto);
     }
 
 

@@ -2,11 +2,13 @@ package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.service
 
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.Person;
 
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dto.PersonDto;
 import reactor.core.publisher.Mono;
 
 public interface IPersonServiceDto {
 
 	Mono<Person> savePerson(Person person);
-	Mono<Person> findBynumDoc(String numDoc);
+	Mono<PersonDto> updatePerson(PersonDto personDto, String id);
+	Mono<PersonDto> findBynumDoc(String numDoc);
 	
 }

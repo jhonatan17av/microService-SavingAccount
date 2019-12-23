@@ -1,5 +1,6 @@
 package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.services.serviceDto;
 
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dto.PersonDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.d
 
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,13 +30,24 @@ public class PersonServiceDtoImpl implements IPersonServiceDto {
 	}
 
 	@Override
-	public Mono<Person> findBynumDoc(String numDoc) {
+	public Mono<PersonDto> updatePerson(PersonDto personDto, String id) {
+		return client.put()
+				.uri("/{id}", Collections.singletonMap("id",id))
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)
+				.syncBody(personDto)
+				.retrieve()
+				.bodyToMono(PersonDto.class);
+	}
+
+	@Override
+	public Mono<PersonDto> findBynumDoc(String numDoc) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("numDoc", numDoc);
 		return client.get()
 				.uri("/document/{numDoc}",params)
 				.accept(MediaType.APPLICATION_JSON)
 				.retrieve()
-				.bodyToMono(Person.class);
+				.bodyToMono(PersonDto.class);
 	}
 }
