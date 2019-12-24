@@ -70,7 +70,10 @@ public class SavingAccountServiceImpl implements ISavingAccountService {
 
         documents.forEach(numDoc -> {
             if (personService.findBynumDoc(numDoc) != null) {
-                return null;
+                return personService.findBynumDoc(numDoc)
+                        .flatMap(personDto -> {
+                            Flux.fromIterable(personDto.getAccountsList());
+                        })
             } else {
                 return repoSavingAccount.save(conv.toSavingAccount(savingAccountDto))
                         .flatMap(savingAccount -> {
