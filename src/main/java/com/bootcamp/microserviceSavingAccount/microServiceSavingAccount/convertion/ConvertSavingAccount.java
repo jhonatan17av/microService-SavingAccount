@@ -1,5 +1,6 @@
 package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.convertion;
 
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.Account;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.Movement;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.Person;
 import org.springframework.stereotype.Controller;
@@ -37,15 +38,7 @@ public class ConvertSavingAccount {
 		return savingAccount;
 	}
 
-	public Person toPerson(SavingAccountDto dto){
-
-		/*List<Person> lst = new ArrayList<>();
-		dto.getListPersons().forEach();
-
-		Person person = new Person();
-		person.setNamePerson();
-
-		 */
+	public SavingAccount toSavingAccountFromAccount(SavingAccount account){
 
 		return null;
 	}

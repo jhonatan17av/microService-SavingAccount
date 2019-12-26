@@ -55,6 +55,35 @@ public class SavingAccountRestController {
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
+    @PostMapping("/upd/{numDoc}")
+    public Mono<ResponseEntity<Map<String, Object>>> saveAccount2(@RequestBody Mono<SavingAccount> savingAccountMono, @PathVariable String numDoc) {
+
+        Map<String, Object> respuesta = new HashMap<>();
+
+        return savingAccountMono.flatMap(savingAccount -> {
+            return savingAccountService.validated(savingAccount,numDoc)
+                    .map(p -> {
+                        respuesta.put("SavingAccount :", savingAccount);
+                        return ResponseEntity
+                                .created(URI.create("/savingAccount"))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(respuesta);
+                    });
+        }).onErrorResume(throwable -> {
+            return Mono.just(throwable).cast(WebExchangeBindException.class)
+                    .flatMap(e -> Mono.just(e.getFieldErrors()))
+                    .flatMapMany(Flux::fromIterable)
+                    .map(fieldError -> "El campo" + fieldError.getField() + " " + fieldError.getDefaultMessage())
+                    .collectList()
+                    .flatMap(list -> {
+                        respuesta.put("Errors : ", list);
+                        respuesta.put("timestamp : ", new Date());
+                        respuesta.put("status", HttpStatus.BAD_REQUEST.value());
+                        return Mono.just(ResponseEntity.badRequest().body(respuesta));
+                    });
+        });
+    }
+
     @PostMapping
     public Mono<ResponseEntity<Map<String, Object>>> saveAccount(@RequestBody Mono<SavingAccountDto> savingAccountMono) {
 

@@ -5,6 +5,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.Data;
+
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.util.Date;
 
@@ -22,6 +24,7 @@ public class SavingAccount {
     @NotBlank
     private String typeAccount;
     @NotBlank
+    @Min(value = 0,message = "Valor minimo 0")
     private Double currentBalance;
     @NotBlank
     private String status;
@@ -31,6 +34,7 @@ public class SavingAccount {
     @NotBlank
     @JsonFormat(pattern = "dd-MM-yyyy")
     private Date updatedAt;
+    @NotBlank
 
     public SavingAccount() {
     }
