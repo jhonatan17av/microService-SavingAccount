@@ -1,15 +1,10 @@
 package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.convertion;
 
-import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.Account;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.Movement;
-import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.Person;
 import org.springframework.stereotype.Controller;
 
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.SavingAccount;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dto.SavingAccountDto;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Controller
 public class ConvertSavingAccount {
@@ -28,6 +23,7 @@ public class ConvertSavingAccount {
 	
 	public SavingAccount toSavingAccount(SavingAccountDto dto) {
 		SavingAccount savingAccount = new SavingAccount();
+		savingAccount.setNomBank(dto.getNomBank());
 		savingAccount.setNumAccount(dto.getNumAccount());
 		savingAccount.setNomAccount(dto.getNomAccount());
 		savingAccount.setTypeAccount(dto.getTypeAccount());
@@ -35,14 +31,9 @@ public class ConvertSavingAccount {
 		savingAccount.setStatus(dto.getStatus());
 		savingAccount.setCreatedAt(dto.getCreatedAt());
 		savingAccount.setUpdatedAt(dto.getUpdatedAt());
+		savingAccount.setCantTransactions(dto.getCantTransactions());
 		return savingAccount;
 	}
-
-	public SavingAccount toSavingAccountFromAccount(SavingAccount account){
-
-		return null;
-	}
-
 
 	public Movement toMovement(SavingAccountDto dto) {
 		Movement movement = new Movement();

@@ -2,11 +2,13 @@ package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.service
 
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.Movement;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.SavingAccount;
-import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dto.PersonDto;
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dto.PersonDtoReturn;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dto.SavingAccountDto;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Date;
 
 public interface ISavingAccountService {
 
@@ -17,10 +19,11 @@ public interface ISavingAccountService {
     Mono<SavingAccount> updateAccount(SavingAccount savingAccount);
     Mono<Void> delete(SavingAccount savingAccount);
 
-    Mono<PersonDto> validated(SavingAccount savingAccount, String numDoc);
+    Mono<PersonDtoReturn> saveAccountOnPerson(SavingAccount savingAccount, String numDoc);
 
     Mono<SavingAccount> saveMovement(Movement movement);
     Flux<Movement> findAllMovement();
     Flux<Movement> findMovByNumAccount(String numAccount);
+    Flux<Movement> findByNumAccountAndDateCreated(String numAccount, String firstDate, String lastDate);
 
 }

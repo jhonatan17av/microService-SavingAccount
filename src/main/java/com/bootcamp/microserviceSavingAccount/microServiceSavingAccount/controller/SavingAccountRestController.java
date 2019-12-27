@@ -46,6 +46,14 @@ public class SavingAccountRestController {
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
+    /*@GetMapping("/{numAccount}/{firstDate}/{lastDate}")
+    public Mono<ResponseEntity<Flux<Movement>>> findNumAccountAndDatecreated(@PathVariable String numAccount,@PathVariable Date firstDate,@PathVariable Date lastDate) {
+        return Mono.just(ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(savingAccountService.findMovByNumAccount(numAccount,firstDate,firstDate)))
+                .defaultIfEmpty(ResponseEntity.notFound());
+    }*/
+
     @GetMapping("/numAccount/{numAccount}")
     public Mono<ResponseEntity<SavingAccount>> findByNumAccout(@PathVariable String numAccount) {
         return savingAccountService.findByNumAccount(numAccount)
@@ -61,7 +69,7 @@ public class SavingAccountRestController {
         Map<String, Object> respuesta = new HashMap<>();
 
         return savingAccountMono.flatMap(savingAccount -> {
-            return savingAccountService.validated(savingAccount,numDoc)
+            return savingAccountService.saveAccountOnPerson(savingAccount,numDoc)
                     .map(p -> {
                         respuesta.put("SavingAccount :", savingAccount);
                         return ResponseEntity
@@ -165,5 +173,8 @@ public class SavingAccountRestController {
                 .body(savingAccountService.findMovByNumAccount(numAccount)))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
+
+
+
 
 }

@@ -1,8 +1,8 @@
 package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.services.serviceDto;
 
-import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.Account;
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dto.AccountDto;
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dto.PersonDtoReturn;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dto.PersonDto;
-import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dto.PersonDto2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -35,33 +35,33 @@ public class PersonServiceDtoImpl implements IPersonServiceDto {
 	}
 
 	@Override
-	public Mono<PersonDto> findBynumDoc(String numDoc) {
+	public Mono<PersonDtoReturn> findBynumDoc(String numDoc) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("numDoc", numDoc);
 		return client.get()
 				.uri("/document/{numDoc}",params)
 				.accept(MediaType.APPLICATION_JSON)
 				.retrieve()
-				.bodyToMono(PersonDto.class);
+				.bodyToMono(PersonDtoReturn.class);
 	}
 
 	@Override
-	public Mono<PersonDto> updatePerson(PersonDto2 personDto2, String numDoc) {
+	public Mono<PersonDtoReturn> updatePerson(PersonDto personDto, String numDoc) {
 		return client.put()
 				.uri("/dto/{numDoc}", Collections.singletonMap("numDoc",numDoc))
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
-				.syncBody(personDto2)
+				.syncBody(personDto)
 				.retrieve()
-				.bodyToMono(PersonDto.class);
+				.bodyToMono(PersonDtoReturn.class);
 	}
 
 	@Override
-	public Flux<Account> lstAccounts(String numDoc) {
+	public Flux<AccountDto> lstAccounts(String numDoc) {
 		return client.get()
 				.uri("/lstAccount/{numDoc}",Collections.singletonMap("numDoc",numDoc))
 				.accept(MediaType.APPLICATION_JSON)
 				.retrieve()
-				.bodyToFlux(Account.class);
+				.bodyToFlux(AccountDto.class);
 	}
 }

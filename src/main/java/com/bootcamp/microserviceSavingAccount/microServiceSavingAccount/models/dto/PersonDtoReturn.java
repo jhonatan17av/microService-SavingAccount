@@ -1,6 +1,5 @@
 package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dto;
 
-import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.Account;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
@@ -9,7 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-public class PersonDto2 {
+public class PersonDtoReturn {
 
     @NotBlank
     private String id;
@@ -33,9 +32,6 @@ public class PersonDto2 {
     @JsonFormat(pattern = "dd-MM-yyyy")
     private Date updatedAt;
     @NotBlank
-    private String numAccount;
-    private String nomAccount;
-    private String typeAccount;
-    private String status;
+    private List<AccountDto> accountsList;
 
 }

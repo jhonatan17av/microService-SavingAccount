@@ -4,9 +4,12 @@ import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.d
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import reactor.core.publisher.Flux;
 
+import java.util.Date;
+
 public interface MovementRespository extends ReactiveMongoRepository<Movement, String> {
 
-    public Flux<Movement> findBynumAccount(String numAccount);
+    Flux<Movement> findBynumAccount(String numAccount);
+    Flux<Movement> findBynumAccountAndcreatedAtBetween(String numAccount, Date firstDate, Date lastDate);
 
 
 }

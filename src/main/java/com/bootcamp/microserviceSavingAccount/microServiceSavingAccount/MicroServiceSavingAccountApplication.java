@@ -40,11 +40,11 @@ public class MicroServiceSavingAccountApplication implements CommandLineRunner {
 		mongoTemplate.dropCollection("savingAccounts").subscribe();
 		mongoTemplate.dropCollection("movements").subscribe();
 
-		Flux.just(new SavingAccount("9876543210","Cuenta de Ahorro","Vip" ,10000.00,"Active",new Date(),new Date()))
+		Flux.just(new SavingAccount("Interbank","9876543210","Cuenta de Ahorro","Vip" ,10000.00,"Active",new Date(),new Date(),0))
 				.flatMap(savingAccount -> savingAccountRepository.save(savingAccount))
 				.subscribe(savingAccount -> log.info("SavingAccount inserted :" + savingAccount.getNumAccount()));
 
-		Flux.just(new Movement("9876543210","deposito",200.0,new Date()))
+		Flux.just(new Movement("9876543210","deposito",200.0,0.0,new Date()))
 				.flatMap(movement -> movementRespository.save(movement))
 				.subscribe(movement -> log.info("Movement inserted :" + movement.getNumAccount()));
 	}

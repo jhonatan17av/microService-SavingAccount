@@ -1,11 +1,11 @@
 package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.services;
 
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.convertion.ConvertSavingAccount;
-import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.Account;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.Movement;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.SavingAccount;
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dto.AccountDto;
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dto.PersonDtoReturn;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dto.PersonDto;
-import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dto.PersonDto2;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dto.SavingAccountDto;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.repository.MovementRespository;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.repository.SavingAccountRepository;
@@ -14,9 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.Validator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 
@@ -31,9 +32,6 @@ public class SavingAccountServiceImpl implements ISavingAccountService {
     private IPersonServiceDto personService;
     @Autowired
     private ConvertSavingAccount conv;
-
-    @Autowired
-    private Validator validator;
 
     private static final Logger LOG =
             LoggerFactory.getLogger(SavingAccountServiceImpl.class);
@@ -81,15 +79,16 @@ public class SavingAccountServiceImpl implements ISavingAccountService {
     }
 
     @Override
-    public Mono<PersonDto> validated(SavingAccount savingAccount, String numDoc) {
+    public Mono<PersonDtoReturn> saveAccountOnPerson(SavingAccount savingAccount, String numDoc) {
 
         return personService.lstAccounts(numDoc)
                 .collectList()
                 .flatMap(accounts -> {
                     boolean value = false;
 
-                    for (Account account : accounts){
-                        if (account.getNomAccount().equals("Cuenta de Ahorro") && account.getTypeAccount().equals(savingAccount.getTypeAccount())) {
+                    for (AccountDto account : accounts){
+                        if (account.getNomAccount().equals("Cuenta de Ahorro")
+                                && account.getTypeAccount().equals(savingAccount.getTypeAccount()) && account.getNomBank().equalsIgnoreCase(savingAccount.getNomBank())) {
                             value = true;
                             break;
                         }
@@ -99,16 +98,16 @@ public class SavingAccountServiceImpl implements ISavingAccountService {
                         return repoSavingAccount.save(savingAccount)
                                 .flatMap(x -> {
                                     return personService.findBynumDoc(numDoc)
-                                            .flatMap(personDto -> {
-                                                PersonDto2 p = new PersonDto2();
-                                                p.setNamePerson(personDto.getNamePerson());
-                                                p.setLastName(personDto.getLastName());
-                                                p.setTypeDoc(personDto.getTypeDoc());
-                                                p.setNumDoc(personDto.getNumDoc());
-                                                p.setGender(personDto.getGender());
-                                                p.setDateBirth(personDto.getDateBirth());
-                                                p.setCreatedAt(personDto.getCreatedAt());
-                                                p.setUpdatedAt(personDto.getUpdatedAt());
+                                            .flatMap(personDtoReturn -> {
+                                                PersonDto p = new PersonDto();
+                                                p.setNamePerson(personDtoReturn.getNamePerson());
+                                                p.setLastName(personDtoReturn.getLastName());
+                                                p.setTypeDoc(personDtoReturn.getTypeDoc());
+                                                p.setNumDoc(personDtoReturn.getNumDoc());
+                                                p.setGender(personDtoReturn.getGender());
+                                                p.setDateBirth(personDtoReturn.getDateBirth());
+                                                p.setCreatedAt(personDtoReturn.getCreatedAt());
+                                                p.setUpdatedAt(personDtoReturn.getUpdatedAt());
                                                 p.setNumAccount(x.getNumAccount());
                                                 p.setNomAccount(x.getNomAccount());
                                                 p.setTypeAccount(x.getTypeAccount());
@@ -130,18 +129,30 @@ public class SavingAccountServiceImpl implements ISavingAccountService {
     public Mono<SavingAccount> saveMovement(Movement movement) {
 
         return repoSavingAccount.findBynumAccount(movement.getNumAccount())
+
                 .flatMap(savingAccount -> {
 
+                    double comi = 0.0;
+
+                    if (savingAccount.getCantTransactions() > 5){
+                        movement.setCommission(movement.getBalanceTransaction() * 0.1);
+                    }else {
+                        movement.setCommission(comi);
+                    }
                     movement.setCreatedAt(new Date());
+
                     return repoMovement.save(movement)
-                            .flatMap(s -> {
-                                if (movement.getTypeMovement().trim().toLowerCase().equals("deposito")) {
-                                    savingAccount.setUpdatedAt(new Date());
-                                    savingAccount.setCurrentBalance(savingAccount.getCurrentBalance() + movement.getBalanceTransaction());
+                            .flatMap(m -> {
+                                savingAccount.setCantTransactions(savingAccount.getCantTransactions() + 1);
+                                if (movement.getTypeMovement().trim().toLowerCase().equalsIgnoreCase("deposito")) {
+                                        movement.setCommission(movement.getBalanceTransaction() * 0.1);
+                                        savingAccount.setCurrentBalance(savingAccount.getCurrentBalance() + movement.getBalanceTransaction() - movement.getCommission());
                                     return repoSavingAccount.save(savingAccount);
-                                } else if (movement.getTypeMovement().trim().toLowerCase().equals("retiro")) {
-                                    savingAccount.setCurrentBalance(savingAccount.getCurrentBalance() - movement.getBalanceTransaction());
+                                } else if (movement.getTypeMovement().trim().toLowerCase().equalsIgnoreCase("retiro")) {
+
+                                    savingAccount.setCurrentBalance(savingAccount.getCurrentBalance() - movement.getBalanceTransaction() - movement.getCommission());
                                     return repoSavingAccount.save(savingAccount);
+
                                 }
                                 return Mono.just(savingAccount);
                             });
@@ -156,6 +167,11 @@ public class SavingAccountServiceImpl implements ISavingAccountService {
     @Override
     public Flux<Movement> findMovByNumAccount(String numAccount) {
         return repoMovement.findBynumAccount(numAccount);
+    }
+
+    @Override
+    public Flux<Movement> findByNumAccountAndDateCreated(String numAccount, String firstDate, String lastDate) {
+        return null;
     }
 
 }

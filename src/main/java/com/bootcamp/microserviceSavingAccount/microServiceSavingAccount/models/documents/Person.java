@@ -28,6 +28,8 @@ public class Person {
     @JsonFormat(pattern = "dd-MM-yyyy")
     private Date updatedAt;
     @NotBlank
+    private String nomBank;
+    @NotBlank
     private String numAccount;
     @NotBlank
     private String nomAccount;
