@@ -46,13 +46,13 @@ public class SavingAccountRestController {
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    /*@GetMapping("/{numAccount}/{firstDate}/{lastDate}")
-    public Mono<ResponseEntity<Flux<Movement>>> findNumAccountAndDatecreated(@PathVariable String numAccount,@PathVariable Date firstDate,@PathVariable Date lastDate) {
+    @GetMapping("/{numAccount}/{firstDate}/{lastDate}")
+    public Mono<ResponseEntity<Flux<Movement>>> findNumAccountAndDatecreated(@PathVariable String numAccount,@PathVariable String firstDate,@PathVariable String lastDate) {
         return Mono.just(ResponseEntity.ok()
         .contentType(MediaType.APPLICATION_JSON)
         .body(savingAccountService.findMovByNumAccount(numAccount,firstDate,firstDate)))
                 .defaultIfEmpty(ResponseEntity.notFound());
-    }*/
+    }
 
     @GetMapping("/numAccount/{numAccount}")
     public Mono<ResponseEntity<SavingAccount>> findByNumAccout(@PathVariable String numAccount) {
