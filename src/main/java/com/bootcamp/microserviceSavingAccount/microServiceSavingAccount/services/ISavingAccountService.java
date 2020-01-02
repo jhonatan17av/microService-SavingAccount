@@ -8,6 +8,7 @@ import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.d
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.text.ParseException;
 import java.util.Date;
 
 public interface ISavingAccountService {
@@ -15,15 +16,16 @@ public interface ISavingAccountService {
     Flux<SavingAccount> findAll();
     Mono<SavingAccount> findById(String id);
     Mono<SavingAccount> findByNumAccount(String numAccount);
+    Flux<SavingAccount> findByNomBank(String nomBank);
     Mono<SavingAccountDto> saveSavingAccount(SavingAccountDto savingAccountDto);
     Mono<SavingAccount> updateAccount(SavingAccount savingAccount);
     Mono<Void> delete(SavingAccount savingAccount);
 
-    Mono<PersonDtoReturn> saveAccountOnPerson(SavingAccount savingAccount, String numDoc);
+    Mono<SavingAccount> saveAccountOnPerson(SavingAccount savingAccount, String numDoc);
 
     Mono<SavingAccount> saveMovement(Movement movement);
     Flux<Movement> findAllMovement();
     Flux<Movement> findMovByNumAccount(String numAccount);
-    Flux<Movement> findByNumAccountAndDateCreated(String numAccount, String firstDate, String lastDate);
+    Flux<Movement> findByNumAccountAndDateCreated(String numAccount, String d1, String d2) throws ParseException;
 
 }

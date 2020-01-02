@@ -1,5 +1,6 @@
 package com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.services;
 
+import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.configuration.Constants;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.convertion.ConvertSavingAccount;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.Movement;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.documents.SavingAccount;
@@ -20,162 +21,191 @@ import reactor.core.publisher.Mono;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.SimpleTimeZone;
 
 
 @Service
 public class SavingAccountServiceImpl implements ISavingAccountService {
 
-    @Autowired
-    private SavingAccountRepository repoSavingAccount;
-    @Autowired
-    private MovementRespository repoMovement;
-    @Autowired
-    private IPersonServiceDto personService;
-    @Autowired
-    private ConvertSavingAccount conv;
+  @Autowired
+  private SavingAccountRepository repoSavingAccount;
+  @Autowired
+  private MovementRespository repoMovement;
+  @Autowired
+  private IPersonServiceDto personService;
+  @Autowired
+  private ConvertSavingAccount conv;
 
-    private static final Logger LOG =
-            LoggerFactory.getLogger(SavingAccountServiceImpl.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(SavingAccountServiceImpl.class);
 
 
-    @Override
-    public Flux<SavingAccount> findAll() {
-        return repoSavingAccount.findAll();
+  @Override
+  public Flux<SavingAccount> findAll() {
+    return repoSavingAccount.findAll();
+  }
+
+  @Override
+  public Mono<SavingAccount> findById(String id) {
+    return repoSavingAccount.findById(id);
+  }
+
+  @Override
+  public Mono<SavingAccount> findByNumAccount(String numAccount) {
+    return repoSavingAccount.findBynumAccount(numAccount);
+  }
+
+  @Override
+  public Flux<SavingAccount> findByNomBank(String nomBank) {
+    return repoSavingAccount.findBynomBank(nomBank);
+  }
+
+  @Override
+  public Mono<SavingAccountDto> saveSavingAccount(SavingAccountDto savingAccountDto) {
+
+    if (savingAccountDto.getNumAccount() == null || savingAccountDto.getNumAccount().equalsIgnoreCase("null")) {
+      savingAccountDto.setNumAccount(Constants.NUM_ACCOUNT);
     }
 
-    @Override
-    public Mono<SavingAccount> findById(String id) {
-        return repoSavingAccount.findById(id);
+    if (savingAccountDto.getNomAccount() == null || savingAccountDto.getNomAccount().equalsIgnoreCase("null")) {
+      savingAccountDto.setNomAccount(Constants.NOM_ACCOUNT);
     }
 
-    @Override
-    public Mono<SavingAccount> findByNumAccount(String numAccount) {
-        return repoSavingAccount.findBynumAccount(numAccount);
-    }
+    return repoSavingAccount.save(conv.toSavingAccount(savingAccountDto))
+        .flatMap(savingAccount -> {
+          savingAccountDto.getListPersons().forEach(person -> {
+            person.setNomBank(savingAccount.getNomBank());
+            person.setNumAccount(savingAccount.getNumAccount());
+            person.setNomAccount(savingAccount.getNomAccount());
+            person.setTypeAccount(savingAccount.getTypeAccount());
+            person.setStatus(savingAccount.getStatus());
+            personService.savePerson(person).block();
+          });
+          return Mono.just(savingAccountDto);
+        });
+  }
 
-   @Override
-    public Mono<SavingAccountDto> saveSavingAccount(SavingAccountDto savingAccountDto) {
+  @Override
+  public Mono<SavingAccount> updateAccount(SavingAccount savingAccount) {
+    return repoSavingAccount.save(savingAccount);
+  }
 
-        return repoSavingAccount.save(conv.toSavingAccount(savingAccountDto))
-                .flatMap(savingAccount -> {
-                    savingAccountDto.getListPersons().forEach(person -> {
-                        person.setNumAccount(savingAccount.getNumAccount());
-                        person.setNomAccount(savingAccount.getNomAccount());
-                        person.setTypeAccount(savingAccount.getTypeAccount());
-                        person.setStatus(savingAccount.getStatus());
-                        personService.savePerson(person).block();
-                    });
-                    return Mono.just(savingAccountDto);
-                });
-    }
+  @Override
+  public Mono<Void> delete(SavingAccount savingAccount) {
+    return repoSavingAccount.delete(savingAccount);
+  }
 
-    @Override
-    public Mono<SavingAccount> updateAccount(SavingAccount savingAccount) {
-        return repoSavingAccount.save(savingAccount);
-    }
+  @Override
+  public Mono<SavingAccount> saveAccountOnPerson(SavingAccount savingAccount, String numDoc) {
 
-    @Override
-    public Mono<Void> delete(SavingAccount savingAccount) {
-        return repoSavingAccount.delete(savingAccount);
-    }
+    return personService.lstAccounts(numDoc)
+        .collectList()
+        .flatMap(accounts -> {
 
-    @Override
-    public Mono<PersonDtoReturn> saveAccountOnPerson(SavingAccount savingAccount, String numDoc) {
+          boolean value = false;
 
-        return personService.lstAccounts(numDoc)
-                .collectList()
-                .flatMap(accounts -> {
-                    boolean value = false;
+          for (AccountDto account : accounts) {
+            if (account.getNomAccount().equals(savingAccount.getNomAccount())
+                && account.getTypeAccount().equals(savingAccount.getTypeAccount()) && account.getNomBank().equalsIgnoreCase(savingAccount.getNomBank())) {
+              value = true;
+              break;
+            }
+          }
 
-                    for (AccountDto account : accounts){
-                        if (account.getNomAccount().equals("Cuenta de Ahorro")
-                                && account.getTypeAccount().equals(savingAccount.getTypeAccount()) && account.getNomBank().equalsIgnoreCase(savingAccount.getNomBank())) {
-                            value = true;
-                            break;
-                        }
-                    }
-
-                    if (!value){
-                        return repoSavingAccount.save(savingAccount)
-                                .flatMap(x -> {
-                                    return personService.findBynumDoc(numDoc)
-                                            .flatMap(personDtoReturn -> {
-                                                PersonDto p = new PersonDto();
-                                                p.setNamePerson(personDtoReturn.getNamePerson());
-                                                p.setLastName(personDtoReturn.getLastName());
-                                                p.setTypeDoc(personDtoReturn.getTypeDoc());
-                                                p.setNumDoc(personDtoReturn.getNumDoc());
-                                                p.setGender(personDtoReturn.getGender());
-                                                p.setDateBirth(personDtoReturn.getDateBirth());
-                                                p.setCreatedAt(personDtoReturn.getCreatedAt());
-                                                p.setUpdatedAt(personDtoReturn.getUpdatedAt());
-                                                p.setNumAccount(x.getNumAccount());
-                                                p.setNomAccount(x.getNomAccount());
-                                                p.setTypeAccount(x.getTypeAccount());
-                                                p.setStatus(x.getStatus());
-                                                return personService.updatePerson(p,numDoc)
-                                                        .flatMap(personDto1 -> {
-                                                            personDto1.setId(savingAccount.getId());
-                                                            return Mono.just(personDto1);
-                                                        });
-                                            });
-                                });
-                    }else{
-                        return Mono.empty();
-                    }
-                });
-    }
-
-    @Override
-    public Mono<SavingAccount> saveMovement(Movement movement) {
-
-        return repoSavingAccount.findBynumAccount(movement.getNumAccount())
-
-                .flatMap(savingAccount -> {
-
-                    double comi = 0.0;
-
-                    if (savingAccount.getCantTransactions() > 5){
-                        movement.setCommission(movement.getBalanceTransaction() * 0.1);
-                    }else {
-                        movement.setCommission(comi);
-                    }
-                    movement.setCreatedAt(new Date());
-
-                    return repoMovement.save(movement)
-                            .flatMap(m -> {
-                                savingAccount.setCantTransactions(savingAccount.getCantTransactions() + 1);
-                                if (movement.getTypeMovement().trim().toLowerCase().equalsIgnoreCase("deposito")) {
-                                        movement.setCommission(movement.getBalanceTransaction() * 0.1);
-                                        savingAccount.setCurrentBalance(savingAccount.getCurrentBalance() + movement.getBalanceTransaction() - movement.getCommission());
-                                    return repoSavingAccount.save(savingAccount);
-                                } else if (movement.getTypeMovement().trim().toLowerCase().equalsIgnoreCase("retiro")) {
-
-                                    savingAccount.setCurrentBalance(savingAccount.getCurrentBalance() - movement.getBalanceTransaction() - movement.getCommission());
-                                    return repoSavingAccount.save(savingAccount);
-
-                                }
-                                return Mono.just(savingAccount);
+          if (savingAccount.getNomAccount() == null || savingAccount.getNomAccount().equalsIgnoreCase("null")) {
+            savingAccount.setNomAccount(Constants.NOM_ACCOUNT);
+          }
+          if (!value) {
+            return repoSavingAccount.save(savingAccount)
+                .flatMap(x -> {
+                  return personService.findBynumDoc(numDoc)
+                      .flatMap(personDtoReturn -> {
+                        PersonDto p = new PersonDto();
+                        p.setNamePerson(personDtoReturn.getNamePerson());
+                        p.setLastName(personDtoReturn.getLastName());
+                        p.setTypeDoc(personDtoReturn.getTypeDoc());
+                        p.setNumDoc(personDtoReturn.getNumDoc());
+                        p.setGender(personDtoReturn.getGender());
+                        p.setDateBirth(personDtoReturn.getDateBirth());
+                        p.setCreatedAt(personDtoReturn.getCreatedAt());
+                        p.setUpdatedAt(personDtoReturn.getUpdatedAt());
+                        p.setNomBank(x.getNomBank());
+                        p.setNumAccount(x.getNumAccount());
+                        p.setNomAccount(x.getNomAccount());
+                        p.setTypeAccount(x.getTypeAccount());
+                        p.setStatus(x.getStatus());
+                        return personService.updatePerson(p, numDoc)
+                            .flatMap(personDto1 -> {
+                              personDto1.setId(savingAccount.getId());
+                              return Mono.just(savingAccount);
                             });
+                      });
                 });
-    }
+          } else {
+            return Mono.empty();
+          }
+        });
+  }
 
-    @Override
-    public Flux<Movement> findAllMovement() {
-        return repoMovement.findAll();
-    }
+  @Override
+  public Mono<SavingAccount> saveMovement(Movement movement) {
+    return repoSavingAccount.findBynumAccount(movement.getNumAccount())
 
-    @Override
-    public Flux<Movement> findMovByNumAccount(String numAccount) {
-        return repoMovement.findBynumAccount(numAccount);
-    }
+        .flatMap(creditCard -> {
+          double comi = 0.0;
 
-    @Override
-    public Flux<Movement> findByNumAccountAndDateCreated(String numAccount, String firstDate, String lastDate) {
-        /*SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
-        return repoMovement.findBynumAccountAndcreatedAtBetween(numAccount, formatter.parse(firstDate),formatter.parse(lastDate));*/
-        return null;
-    }
+          if (movement.getTypeMovement().equalsIgnoreCase("retiro") && movement.getBalanceTransaction() < creditCard.getCurrentBalance()) {
+
+            if (creditCard.getCantTransactions() > 5) {
+              movement.setCommission(movement.getBalanceTransaction() * 0.1);
+            } else {
+              movement.setCommission(comi);
+            }
+
+            movement.setCreatedAt(new Date());
+
+            return repoMovement.save(movement)
+                .flatMap(m -> {
+                  creditCard.setCantTransactions(creditCard.getCantTransactions() + 1);
+                  creditCard.setCurrentBalance(creditCard.getCurrentBalance() - movement.getBalanceTransaction() - movement.getCommission());
+                  return repoSavingAccount.save(creditCard);
+                });
+
+          } else if (movement.getTypeMovement().equalsIgnoreCase("deposito")) {
+
+            if (creditCard.getCantTransactions() > 5) {
+              movement.setCommission(movement.getBalanceTransaction() * 0.1);
+            } else {
+              movement.setCommission(comi);
+            }
+            movement.setCreatedAt(new Date());
+
+            return repoMovement.save(movement).
+                flatMap(m -> {
+                  creditCard.setCantTransactions(creditCard.getCantTransactions() + 1);
+                  creditCard.setCurrentBalance(creditCard.getCurrentBalance() + movement.getBalanceTransaction() - movement.getCommission());
+                  return repoSavingAccount.save(creditCard);
+                });
+          }
+          return Mono.just(creditCard);
+        });
+
+  }
+
+  @Override
+  public Flux<Movement> findAllMovement() {
+    return repoMovement.findAll();
+  }
+
+  @Override
+  public Flux<Movement> findMovByNumAccount(String numAccount) {
+    return repoMovement.findBynumAccount(numAccount);
+  }
+
+  @Override
+  public Flux<Movement> findByNumAccountAndDateCreated(String numAccount, String firstDate, String lastDate) throws ParseException {
+    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+    return repoMovement.findByNumAccountAndCreatedAtBetween(numAccount, formatter.parse(firstDate), formatter.parse(lastDate));
+  }
+
 
 }
