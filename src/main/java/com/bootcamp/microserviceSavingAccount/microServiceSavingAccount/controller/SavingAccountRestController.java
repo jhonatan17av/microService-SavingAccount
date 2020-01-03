@@ -7,6 +7,7 @@ import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.d
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.models.dto.SavingAccountDto;
 import com.bootcamp.microserviceSavingAccount.microServiceSavingAccount.services.ISavingAccountService;
 
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
+@Api(value = "Controller-Person", description = "Methods on Controller to Person")
 @RequestMapping("/savingAccount")
 public class SavingAccountRestController {
 
@@ -66,18 +68,18 @@ public class SavingAccountRestController {
   }
 
   @GetMapping("/nomBank/{nomBank}")
-  public Mono<ResponseEntity<Flux<SavingAccount>>> findByNomBank(@PathVariable String nomBank){
-      return Mono.just(ResponseEntity.ok()
-          .contentType(MediaType.APPLICATION_JSON)
-          .body(savingAccountService.findByNomBank(nomBank)))
-          .defaultIfEmpty(ResponseEntity.notFound().build());
-    }
+  public Mono<ResponseEntity<Flux<SavingAccount>>> findByNomBank(@PathVariable String nomBank) {
+    return Mono.just(ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(savingAccountService.findByNomBank(nomBank)))
+        .defaultIfEmpty(ResponseEntity.notFound().build());
+  }
 
-  @PostMapping("/upd/{numDoc}")
-  public Mono<ResponseEntity<SavingAccount>> saveAccount2(@RequestBody SavingAccount savingAccountMono, @PathVariable String numDoc) {
+  @PostMapping("/onPerson/{numDoc}")
+  public Mono<ResponseEntity<SavingAccount>> saveOnPerson(@RequestBody SavingAccount savingAccountMono, @PathVariable String numDoc) {
     return Mono.just(savingAccountMono)
         .flatMap(savingAccountMono1 -> {
-          return savingAccountService.saveAccountOnPerson(savingAccountMono,numDoc)
+          return savingAccountService.saveAccountOnPerson(savingAccountMono, numDoc)
               .map(s -> ResponseEntity.created(URI.create("/savingAccount"))
                   .contentType(MediaType.APPLICATION_JSON).body(s));
         });
@@ -89,7 +91,7 @@ public class SavingAccountRestController {
     return Mono.just(savingAccountMono)
         .flatMap(savingAccountDtoMono -> {
           return savingAccountService.saveSavingAccount(savingAccountMono)
-              .map(s -> ResponseEntity.created(URI.create("/savingAccount/numAccount"))
+              .map(s -> ResponseEntity.created(URI.create("/savingAccount"))
                   .contentType(MediaType.APPLICATION_JSON).body(s));
         });
 

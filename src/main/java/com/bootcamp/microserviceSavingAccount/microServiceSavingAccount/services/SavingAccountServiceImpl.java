@@ -105,7 +105,8 @@ public class SavingAccountServiceImpl implements ISavingAccountService {
 
           for (AccountDto account : accounts) {
             if (account.getNomAccount().equals(savingAccount.getNomAccount())
-                && account.getTypeAccount().equals(savingAccount.getTypeAccount()) && account.getNomBank().equalsIgnoreCase(savingAccount.getNomBank())) {
+                && account.getTypeAccount().equals(savingAccount.getTypeAccount())
+                && account.getNomBank().equalsIgnoreCase(savingAccount.getNomBank())) {
               value = true;
               break;
             }
