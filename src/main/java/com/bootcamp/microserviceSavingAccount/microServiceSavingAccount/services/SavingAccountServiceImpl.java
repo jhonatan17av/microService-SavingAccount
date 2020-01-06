@@ -154,7 +154,7 @@ public class SavingAccountServiceImpl implements ISavingAccountService {
         .flatMap(savingAccount -> {
           double comi = 0.0;
 
-          if (movement.getTypeMovement().equalsIgnoreCase("retiro") && movement.getBalanceTransaction() < savingAccount.getCurrentBalance()) {
+          if (movement.getTypeMovement().equalsIgnoreCase("retiro") && savingAccount.getCurrentBalance() > movement.getBalanceTransaction()) {
 
             if (savingAccount.getCantTransactions() > 5) {
               movement.setCommission(movement.getBalanceTransaction() * 0.1);
